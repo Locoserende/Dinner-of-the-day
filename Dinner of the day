@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dagens middag</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#111b2e;
+      --muted:#9fb0d0;
+      --text:#e9f0ff;
+      --accent:#7aa2ff;
+      --border: rgba(255,255,255,.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 800px at 20% 10%, rgba(122,162,255,.18), transparent 60%),
+                  radial-gradient(1000px 700px at 80% 0%, rgba(98,255,206,.12), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.5;
+      padding: 28px 16px;
+    }
+    .wrap{max-width: 860px; margin:0 auto;}
+    header{
+      display:flex; gap:12px; align-items:baseline; justify-content:space-between;
+      margin-bottom:16px;
+    }
+    h1{margin:0; font-size: 28px;}
+    .sub{color:var(--muted); font-size:14px}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent 60%), var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .controls{
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+      margin-bottom: 14px;
+    }
+    button{
+      background: rgba(122,162,255,.18);
+      color: var(--text);
+      border: 1px solid rgba(122,162,255,.35);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight: 600;
+    }
+    button:hover{background: rgba(122,162,255,.26)}
+    .file{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    input[type="file"]{
+      color: var(--muted);
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      align-items:stretch;
+    }
+    @media (max-width: 800px){
+      .hero{grid-template-columns: 1fr}
+    }
+
+    .imgbox{
+      border-radius: 16px;
+      overflow:hidden;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      min-height: 260px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    .imgbox img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:none;
+    }
+    .imgbox .placeholder{
+      padding: 18px;
+      text-align:center;
+      color: var(--muted);
+    }
+    .badge{
+      position:absolute;
+      top:10px; left:10px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--text);
+      backdrop-filter: blur(6px);
+    }
+
+    .meta{
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,.03);
+    }
+    .title{
+      margin: 0 0 8px 0;
+      font-size: 22px;
+    }
+    .kv{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .pill{
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .grid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 800px){
+      .grid{grid-template-columns: 1fr}
+    }
+    h2{
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      color: var(--text);
+    }
+    ul, ol{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+    }
+    li{margin: 6px 0}
+    footer{
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align:center;
+    }
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Dagens middag</h1>
+        <div class="sub">Klikk “Ny middag” for en enkel oppskrift. Last opp bilde hvis du vil.</div>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="controls">
+        <button id="btnNew">🍽️ Ny middag</button>
+        <div class="file">
+          <label for="imgInput"><strong>Last opp bilde:</strong></label>
+          <input id="imgInput" type="file" accept="image/*" />
+          <button id="btnClearImg" type="button">Fjern bilde</button>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="imgbox" id="imgBox">
+          <div class="badge">Bilde av retten</div>
+          <img id="dishImg" alt="Bilde av retten" />
+          <div class="placeholder" id="placeholder">
+            Ingen bilde lastet opp ennå.<br/>
+            Velg et bilde, så vises det her.
+          </div>
+        </div>
+
+        <div class="meta">
+          <h2 class="title" id="recipeTitle">—</h2>
+          <div class="kv" id="recipeMeta"></div>
+          <div class="note" id="recipeHint"></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="meta">
+          <h2>Ingredienser</h2>
+          <ul id="ingredients"></ul>
+        </div>
+
+        <div class="meta">
+          <h2>Fremgangsmåte</h2>
+          <ol id="steps"></ol>
+        </div>
+      </div>
+
+      <footer>
+        Tips: Du kan enkelt legge inn flere oppskrifter i koden (se <code>RECIPES</code>).
+      </footer>
+    </section>
+  </div>
+
+  <script>
+    // Enkle oppskrifter (du kan legge til flere)
+    const RECIPES = [
+      {
+        title: "Kremet pasta med kylling og pesto",
+        time: "20 min",
+        level: "Enkel",
+        servings: "2–3 porsjoner",
+        hint: "Godt med litt sitron og parmesan på toppen.",
+        ingredients: [
+          "250 g pasta (penne/spaghetti)",
+          "2 kyllingfileter (eller 300 g kyllingstrimler)",
+          "2 ss grønn pesto",
+          "2 dl matfløte (eller havrefløte)",
+          "1 fedd hvitløk (valgfritt)",
+          "Salt og pepper",
+          "Parmesan (valgfritt)"
+        ],
+        steps: [
+          "Kok pasta etter anvisning. Spar 1 dl pastavann før du heller av.",
+          "Stek kyllingen i biter med salt/pepper (og hvitløk om du vil).",
+          "Rør inn fløte og pesto. La småkoke 2–3 minutter.",
+          "Vend inn pasta. Spe med litt pastavann til du får ønsket konsistens.",
+          "Topp med parmesan og server."
+        ]
+      },
+      {
+        title: "Laks i ovn med sitron og poteter",
+        time: "30 min",
+        level: "Enkel",
+        servings: "2 porsjoner",
+        hint: "Bytt potet med søtpotet for en litt annen smak.",
+        ingredients: [
+          "2 laksefileter",
+          "500 g poteter (i båter)",
+          "1 sitron",
+          "1–2 ss olivenolje",
+          "Salt, pepper",
+          "Valgfritt: dill eller persille"
+        ],
+        steps: [
+          "Sett ovnen på 220°C.",
+          "Bland potetbåter med olje, salt og pepper. Stek 15 min.",
+          "Legg laksen på brettet, krydre og skvis over sitron. Stek 10–12 min til.",
+          "Topp med urter og server."
+        ]
+      },
+      {
+        title: "Taco-wraps med bønner (vegetar)",
+        time: "15 min",
+        level: "Veldig enkel",
+        servings: "2 porsjoner",
+        hint: "Vil du ha mer crunch? Legg i knuste tortillachips.",
+        ingredients: [
+          "4 tortillalefser",
+          "1 boks sorte bønner (skylt og avrent)",
+          "1 ts taco-krydder (eller etter smak)",
+          "1/2 paprika i strimler",
+          "1 avokado",
+          "Salsa",
+          "Rømme/plantyoghurt (valgfritt)",
+          "Litt salat"
+        ],
+        steps: [
+          "Varm bønnene i panne med taco-krydder og en skvett vann.",
+          "Smør på salsa (og rømme om du vil) på lefsene.",
+          "Legg på bønner, paprika, salat og avokado.",
+          "Rull sammen og spis."
+        ]
+      },
+      {
+        title: "Rask tomatsuppe med egg og brød",
+        time: "12 min",
+        level: "Enkel",
+        servings: "2 porsjoner",
+        hint: "Chili-flak og litt ost gjør den ekstra digg.",
+        ingredients: [
+          "1 boks hakkede tomater",
+          "2 dl vann eller buljong",
+          "1/2 løk (valgfritt)",
+          "1 ts sukker eller honning (valgfritt)",
+          "Salt og pepper",
+          "2 egg",
+          "Brød til servering"
+        ],
+        steps: [
+          "Kok opp tomater og vann/buljong (stek løk først om du bruker det).",
+          "Smak til med salt/pepper og ev. litt sukker/honning.",
+          "Knekk egg forsiktig i suppen og la trekke 3–4 minutter (eller posjer separat).",
+          "Server med brød."
+        ]
+      }
+    ];
+
+    const $ = (id) => document.getElementById(id);
+
+    function pickRandomRecipe() {
+      const i = Math.floor(Math.random() * RECIPES.length);
+      return RECIPES[i];
+    }
+
+    function setList(el, items, type = "li") {
+      el.innerHTML = "";
+      for (const text of items) {
+        const li = document.createElement(type);
+        li.textContent = text;
+        el.appendChild(li);
+      }
+    }
+
+    function renderRecipe(recipe) {
+      $("recipeTitle").textContent = recipe.title;
+
+      const meta = $("recipeMeta");
+      meta.innerHTML = "";
+      const pills = [
+        `⏱️ ${recipe.time}`,
+        `✅ ${recipe.level}`,
+        `🍽️ ${recipe.servings}`
+      ];
+      for (const p of pills) {
+        const span = document.createElement("span");
+        span.className = "pill";
+        span.textContent = p;
+        meta.appendChild(span);
+      }
+
+      $("recipeHint").textContent = recipe.hint ?? "";
+
+      setList($("ingredients"), recipe.ingredients);
+      setList($("steps"), recipe.steps, "li"); // for ol, li is correct
+    }
+
+    function setImageFromFile(file) {
+      if (!file) return;
+      const img = $("dishImg");
+      const placeholder = $("placeholder");
+
+      const url = URL.createObjectURL(file);
+      img.src = url;
+      img.style.display = "block";
+      placeholder.style.display = "none";
+
+      img.onload = () => {
+        // Frigjør minne når nettleseren er ferdig
+        URL.revokeObjectURL(url);
+      };
+    }
+
+    function clearImage() {
+      const img = $("dishImg");
+      const placeholder = $("placeholder");
+      img.removeAttribute("src");
+      img.style.display = "none";
+      placeholder.style.display = "block";
+      $("imgInput").value = "";
+    }
+
+    // Events
+    $("btnNew").addEventListener("click", () => {
+      renderRecipe(pickRandomRecipe());
+    });
+
+    $("imgInput").addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      setImageFromFile(file);
+    });
+
+    $("btnClearImg").addEventListener("click", clearImage);
+
+    // Første last
+    renderRecipe(pickRandomRecipe());
+  </script>
+</body>
+</html>
